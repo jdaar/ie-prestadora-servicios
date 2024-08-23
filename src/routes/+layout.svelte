@@ -4,10 +4,9 @@
 
 <div class="app">
 	<main>
-		<slot />
+		<slot></slot>
 	</main>
-	<footer>
-	</footer>
+	<footer></footer>
 </div>
 
 <style>
