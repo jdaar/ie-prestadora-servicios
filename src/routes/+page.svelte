@@ -21,6 +21,7 @@
 		.then(() => {
 			concretize(client, GetConnectedUser)
 				.then((user) => {$connectedUser = Option.some(user)})
+			password = "";
 		})
 		.catch(() => {
 			toast.error("No se pudo iniciar sesion")
@@ -34,22 +35,24 @@
 
 <Navbar {client} />
 <main class="w-full flex justify-center">
-	<Card class="max-w-96">
-		<CardHeader>
-			<CardTitle>Iniciar sesion</CardTitle>
-		</CardHeader>
-		<CardContent class="flex flex-col gap-5">
-			<fieldset class="flex flex-col gap-2.5">
-				<Label for="email">Correo</Label>
-				<Input id="email" name="email" type="text" bind:value={email} />
-			</fieldset>
-			<fieldset class="flex flex-col gap-2.5">
-				<Label for="password">Contrasena</Label>
-				<Input id="password" name="password" type="password" bind:value={password} />
-			</fieldset>
-			<Button on:click={signInCallback}>Iniciar sesion</Button>
-		</CardContent>
-	</Card>
+	{#if Option.isNone($connectedUser)}
+		<Card class="max-w-96">
+			<CardHeader>
+				<CardTitle>Iniciar sesion</CardTitle>
+			</CardHeader>
+			<CardContent class="flex flex-col gap-5">
+				<fieldset class="flex flex-col gap-2.5">
+					<Label for="email">Correo</Label>
+					<Input id="email" name="email" type="text" bind:value={email} />
+				</fieldset>
+				<fieldset class="flex flex-col gap-2.5">
+					<Label for="password">Contrasena</Label>
+					<Input id="password" name="password" type="password" bind:value={password} />
+				</fieldset>
+				<Button on:click={signInCallback}>Iniciar sesion</Button>
+			</CardContent>
+		</Card>
+	{/if}
 </main>
 
 <style>
