@@ -24,10 +24,6 @@
 				{$connectedUser.value.email}
 			</small>
 			<Button on:click={logoutCallback}>Cerrar sesion</Button>
-		{:else}
-			<small class="text-sm font-medium leading-none">
-				Usuario anonimo
-			</small>
 		{/if}
 	</section>
 </nav>

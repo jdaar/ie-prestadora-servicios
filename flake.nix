@@ -10,7 +10,7 @@
 			inherit system;
 			config.allowUnfree = true;
 		};
-		packages = with pkgs; [nodejs_22];
+		packages = with pkgs; [nodejs_22 supabase-cli];
 	in 
 	{
 		devShells.${system}.default = pkgs.mkShell {

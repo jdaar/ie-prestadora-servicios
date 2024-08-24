@@ -1,3 +1,3 @@
 import type { User } from "../user";
 
-export type ConnectableUser = User & { readonly password: string };
+export type ConnectableUser = Omit<User, 'id'> & { readonly password: string };

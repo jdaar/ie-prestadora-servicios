@@ -22,7 +22,6 @@ export const load: LayoutLoad = async () => {
 		)
 	)
 
-
 	let user: Option.Option<User>;
 	try {
 		user = Option.some(await concretize(client, GetConnectedUser));

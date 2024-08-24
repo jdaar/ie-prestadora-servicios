@@ -3,6 +3,7 @@ import { ConfigGatewayLive } from "./config";
 import { SupabaseGatewayAdapter, SupabaseInstanceRef, type SupabaseGateway } from "@/domain/gateways/supabase";
 import { SupabaseSDKError } from "@/domain/models/errors/supabase-sdk-error";
 import type { User } from "@/domain/models/user";
+import type { Person } from "@/domain/models/person";
 
 export const SupabaseGatewayLive = Layer.effect(
 	SupabaseGatewayAdapter,
@@ -32,12 +33,12 @@ export const SupabaseGatewayLive = Layer.effect(
 				catch: (error) => new SupabaseSDKError(error)
 			});
 
-		const signOut: SupabaseGateway['signOut'] = () => Effect.tryPromise({
+		const signOut: SupabaseGateway['signOut'] = Effect.tryPromise({
 				try: () => instance.auth.signOut(),
 				catch: (error) => new SupabaseSDKError(error)
 			});
 
-		const getConnectedUserDetails: SupabaseGateway['getConnectedUserDetails'] = () => Effect.tryPromise({
+		const getConnectedUser: SupabaseGateway['getConnectedUser'] = Effect.tryPromise({
 				try: () => instance.auth.getUser(),
 				catch: (error) => new SupabaseSDKError(error)
 			}).pipe(
@@ -48,8 +49,38 @@ export const SupabaseGatewayLive = Layer.effect(
 						)
 					}
 					return Effect.succeed({
+						// TODO: fix
+						id: 0,
 						email: data.data.user?.email
 					} satisfies User)
+				})
+			);
+
+		const getPersons: SupabaseGateway['getPersons'] = Effect.tryPromise({
+				try: () => instance.from('person').select(),
+				catch: (error) => new SupabaseSDKError(error)
+			}).pipe(
+				Effect.flatMap(v => {
+					if (v.error !== null) {
+						return Effect.fail(new SupabaseSDKError(v.error))
+					}
+					return Effect.succeed(v.data.map(v => 
+						v.type == 'NATURAL' ? ({
+							type: 'NATURAL',
+							id: v.id,
+							risk: v.risk!,
+							fullName: v.full_name!,
+							identityType: v.identity_type!,
+							identityNumber: v.identity_number!
+						} satisfies Person)
+						:
+						({
+							type: 'ARTIFICIAL',
+							nit: v.nit!,
+							id: v.id,
+							companyName: v.company_name!
+						} satisfies Person)
+					))
 				})
 			);
 
@@ -57,7 +88,8 @@ export const SupabaseGatewayLive = Layer.effect(
 			signIn,
 			signUp,
 			signOut,
-			getConnectedUserDetails
+			getConnectedUser,
+			getPersons
 		})
 	})
 )

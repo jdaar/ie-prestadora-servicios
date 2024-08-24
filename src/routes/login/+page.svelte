@@ -2,7 +2,6 @@
 	import { concretize } from '@/application/application';
 	import { UserLogin } from '@/domain/use-cases/user-login'
 	import Button from '@/components/ui/button/button.svelte';
-	import Navbar from '@/components/custom/navbar.svelte';
 	import Input from '@/components/ui/input/input.svelte';
 	import { Card, CardTitle, CardContent, CardHeader } from '@/components/ui/card/index.js';
 	import { connectedUser } from '@/application/state.js';
@@ -33,8 +32,7 @@
 	<meta name="description" content="IE Prestadora de servicios" />
 </svelte:head>
 
-<Navbar {client} />
-<main class="w-full flex justify-center">
+<main class="w-full mt-10 flex justify-center">
 	{#if Option.isNone($connectedUser)}
 		<Card class="max-w-96">
 			<CardHeader>
@@ -54,6 +52,3 @@
 		</Card>
 	{/if}
 </main>
-
-<style>
-</style>
