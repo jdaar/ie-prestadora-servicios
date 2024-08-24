@@ -14,12 +14,20 @@
 		.then(() => {$connectedUser = Option.none()});
 </script>
 
-<nav class="justify-between p-5 w-full flex">
-	<h1>IE Prestadora de servicios</h1>
+<nav class="justify-between align-center p-5 w-full flex">
+	<h4 class="scroll-m-20 text-xl text-center align-middle font-semibold tracking-tight">
+		IE Prestadora de servicios
+	</h4>
 	<section class="flex gap-5 justify-center items-center">
 		{#if Option.isSome($connectedUser)}	
-			<h1>{$connectedUser.value.email}</h1>
+			<small class="text-sm font-medium leading-none">
+				{$connectedUser.value.email}
+			</small>
+			<Button on:click={logoutCallback}>Cerrar sesion</Button>
+		{:else}
+			<small class="text-sm font-medium leading-none">
+				Usuario anonimo
+			</small>
 		{/if}
-		<Button on:click={logoutCallback}>Log out</Button>
 	</section>
 </nav>

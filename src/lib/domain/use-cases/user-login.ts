@@ -9,5 +9,5 @@ export const UserLogin = (
 	return yield *_(supabaseGateway.signIn({
 		email,
 		password
-	}))
+	}));
 })

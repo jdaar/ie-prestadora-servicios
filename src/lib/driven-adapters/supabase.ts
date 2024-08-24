@@ -15,7 +15,14 @@ export const SupabaseGatewayLive = Layer.effect(
 					password: user.password
 				}),
 				catch: (error) => new SupabaseSDKError(error)
-			});
+			}).pipe(
+				Effect.flatMap((value) => {
+					if (value.error !== null)
+						return Effect.fail(new SupabaseSDKError(value.error))
+					else
+						return Effect.succeed(value)
+				})
+			);
 
 		const signUp: SupabaseGateway['signUp'] = (user) => Effect.tryPromise({
 				try: () => instance.auth.signUp({
