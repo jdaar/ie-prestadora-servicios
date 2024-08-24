@@ -1,59 +1,63 @@
-import { createClient } from "@supabase/supabase-js";
 import { Effect, Layer } from "effect";
-import { ConfigGatewayAdapter, ConfigGatewayLive } from "./config";
-import { SupabaseGatewayAdapter, SupabaseInstanceAdapter } from "@/domain/gateways/supabase";
+import { ConfigGatewayLive } from "./config";
+import { SupabaseGatewayAdapter, SupabaseInstanceRef, type SupabaseGateway } from "@/domain/gateways/supabase";
 import { SupabaseSDKError } from "@/domain/models/errors/supabase-sdk-error";
-
-export const SupabaseInstanceLive = Layer.effect(
-		SupabaseInstanceAdapter,
-		Effect.gen(function *(_) {
-			const configGateway = yield *_(ConfigGatewayAdapter); 
-			return SupabaseInstanceAdapter.of({
-				client: createClient(
-					configGateway.supabaseClient,
-					configGateway.supabaseSecret,
-					{}
-				)
-			})
-		})
-	)
+import type { User } from "@/domain/models/user";
 
 export const SupabaseGatewayLive = Layer.effect(
 	SupabaseGatewayAdapter,
 	Effect.gen(function *(_) {
-		const instance = yield *_(SupabaseInstanceAdapter);
+		const instance = yield *_(SupabaseInstanceRef);
+
+		const signIn: SupabaseGateway['signIn'] = (user) => Effect.tryPromise({
+				try: () => instance.auth.signInWithPassword({
+					email: user.email,
+					password: user.password
+				}),
+				catch: (error) => new SupabaseSDKError(error)
+			});
+
+		const signUp: SupabaseGateway['signUp'] = (user) => Effect.tryPromise({
+				try: () => instance.auth.signUp({
+					email: user.email,
+					password: user.password
+				}),
+				catch: (error) => new SupabaseSDKError(error)
+			});
+
+		const signOut: SupabaseGateway['signOut'] = () => Effect.tryPromise({
+				try: () => instance.auth.signOut(),
+				catch: (error) => new SupabaseSDKError(error)
+			});
+
+		const getConnectedUserDetails: SupabaseGateway['getConnectedUserDetails'] = () => Effect.tryPromise({
+				try: () => instance.auth.getUser(),
+				catch: (error) => new SupabaseSDKError(error)
+			}).pipe(
+				Effect.flatMap((data) => {
+					if (!data.data.user?.email) {
+						return Effect.fail(
+							new SupabaseSDKError(new Error("retrieved invalid user (reason: null email)"))
+						)
+					}
+					return Effect.succeed({
+						email: data.data.user?.email
+					} satisfies User)
+				})
+			);
+
 		return SupabaseGatewayAdapter.of({
-			signIn: (user) => Effect.tryPromise({
-				try: () => instance.client.auth.signInWithPassword({
-					email: user.email,
-					password: user.password
-				}),
-				catch: (error) => new SupabaseSDKError(error)
-			}),
-			signUp: (user) => Effect.tryPromise({
-				try: () => instance.client.auth.signUp({
-					email: user.email,
-					password: user.password
-				}),
-				catch: (error) => new SupabaseSDKError(error)
-			})
+			signIn,
+			signUp,
+			signOut,
+			getConnectedUserDetails
 		})
 	})
 )
 
-// TODO: gotta find a way to prevent the creation of new instance by memoizing the supabase client reference
 export const MainLive = Layer.merge(
-	SupabaseGatewayLive
-		.pipe(
-			Layer.provide(
-				Layer.merge(
-					Layer.provide(
-						SupabaseInstanceLive,
-						ConfigGatewayLive
-					),
-					ConfigGatewayLive
-				),
-			),
-		),
+	SupabaseGatewayLive.pipe(
+		Layer.provide(ConfigGatewayLive),
+	),
 	ConfigGatewayLive
 )
