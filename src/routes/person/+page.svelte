@@ -8,6 +8,8 @@
 	import SelectableColumnHeader from '@/components/custom/selectable-column-header.svelte';
 	import SearchableColumnHeader from '@/components/custom/searchable-column-header.svelte';
 	import type { Person } from '@/domain/models/person.js';
+	import { read, utils, writeFileXLSX } from 'xlsx';
+	import Button from '@/components/ui/button/button.svelte';
 
 	const { data } = $props();
 	const client = data.client;
@@ -96,6 +98,13 @@
 		)
 	);
 
+	async function exportExcelBookCallback() {
+		const ws = utils.json_to_sheet(await personPromise);
+		const wb = utils.book_new();
+		utils.book_append_sheet(wb, ws, "Data");
+		writeFileXLSX(wb, "Personas.xlsx");
+	}
+
 	let filteredColumnNames = $derived([
 		Option.isSome(documentNumberFilter) ? 'numero de documento' : null,
 		Option.isSome(nameFilter) ? 'nombre' : null,
@@ -106,8 +115,9 @@
 
 <main class="p-5">
 	<Card>
-		<CardHeader>
+		<CardHeader class="flex flex-row justify-between items-center">
 			<CardTitle>Listado de personas</CardTitle>
+			<Button variant="secondary" on:click={exportExcelBookCallback}>Exportar a excel</Button>
 		</CardHeader>
 		<CardContent class="flex flex-col gap-5">
 			<Table.Root>
