@@ -23,7 +23,6 @@
 	<section class="flex gap-5 justify-center items-center">
 		{#if Option.isSome($connectedUser)}	
 			<div class="flex gap-5 items-center">
-				<a href="/person" class={buttonVariants({variant: 'link'})}>Personas</a>
 				<Button variant="secondary" on:click={logoutCallback}>Cerrar sesion</Button>
 			</div>
 		{:else}

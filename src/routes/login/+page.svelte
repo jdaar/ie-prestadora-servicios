@@ -9,6 +9,7 @@
 	import { Option } from 'effect';
 	import { toast } from 'svelte-sonner';
 	import { Label } from '@/components/ui/label/index.js';
+	import { goto } from '$app/navigation';
 
 	const { data } = $props();
 	const client = data.client;
@@ -19,7 +20,7 @@
 	const signInCallback = () => concretize(client, UserLogin(email, password))
 		.then(() => {
 			concretize(client, GetConnectedUser)
-				.then((user) => {$connectedUser = Option.some(user)})
+				.then((user) => {$connectedUser = Option.some(user); goto('/')})
 			password = "";
 		})
 		.catch(() => {
@@ -34,20 +35,22 @@
 
 <main class="w-full mt-10 flex justify-center">
 	{#if Option.isNone($connectedUser)}
-		<Card class="max-w-96">
+		<Card class="w-1/2">
 			<CardHeader>
 				<CardTitle>Iniciar sesion</CardTitle>
 			</CardHeader>
-			<CardContent class="flex flex-col gap-5">
-				<fieldset class="flex flex-col gap-2.5">
-					<Label for="email">Correo</Label>
-					<Input id="email" name="email" type="text" bind:value={email} />
-				</fieldset>
-				<fieldset class="flex flex-col gap-2.5">
-					<Label for="password">Contrasena</Label>
-					<Input id="password" name="password" type="password" bind:value={password} />
-				</fieldset>
-				<Button on:click={signInCallback}>Iniciar sesion</Button>
+			<CardContent>
+				<form on:submit|preventDefault={signInCallback} class="flex flex-col gap-5">
+					<fieldset class="flex flex-col gap-2.5">
+						<Label for="email">Correo</Label>
+						<Input id="email" name="email" type="text" bind:value={email} />
+					</fieldset>
+					<fieldset class="flex flex-col gap-2.5">
+						<Label for="password">Contraseña</Label>
+						<Input id="password" name="password" type="password" bind:value={password} />
+					</fieldset>
+					<Button type="submit">Iniciar sesion</Button>
+				</form>
 			</CardContent>
 		</Card>
 	{/if}
