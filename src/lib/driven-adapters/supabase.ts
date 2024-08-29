@@ -5,6 +5,7 @@ import { SupabaseSDKError } from "@/domain/models/errors/supabase-sdk-error";
 import type { User } from "@/domain/models/user";
 import type { Person } from "@/domain/models/person";
 import type { satisfies } from "effect/Function";
+import { effect } from "effect/Layer";
 
 export const SupabaseGatewayLive = Layer.effect(
 	SupabaseGatewayAdapter,
@@ -85,36 +86,67 @@ export const SupabaseGatewayLive = Layer.effect(
 				})
 			);
 
-		const savePerson: SupabaseGateway['savePerson'] = (person) => 
-		Effect.tryPromise({
-			try: () => instance.from('person').insert({
-				type: person.type,
-				nit: person.nit,
-				company_name: person.companyName,
-				id: person.id,
-				risk: person.risk,
-				full_name: person.fullName,
-				identity_type: person.identityType,
-				identity_number: person.identityNumber
-			}).select().single(),
-			catch: (error) => new SupabaseSDKError(error)
-		}).pipe(
-				Effect.flatMap(v => {
-					if (v.error !== null) {
-						return Effect.fail(new SupabaseSDKError(v.error))
-					}
-					return Effect.succeed({
-						id: v.data.id,
-						identityNumber: v.data.identity_number!,
-						identityType: v.data.identity_type!,
-						fullName: v.data.full_name!,
-						risk: v.data.risk!,
-						companyName: v.data.company_name!,
-						nit: v.data.nit!,
-						type: v.data.type!
-					} satisfies Person)
-				})
-		)
+			const savePerson: SupabaseGateway['savePerson'] = (person) => 
+				Effect.succeed(person.id)
+					.pipe(
+						Effect.flatMap((value) => {
+							if (value !== undefined) {
+								return Effect.tryPromise({
+									try: () => instance.from('person').update({
+										type: person.type,
+										nit: person.nit,
+										company_name: person.companyName,
+										id: person.id,
+										risk: person.risk,
+										full_name: person.fullName,
+										identity_type: person.identityType,
+										identity_number: person.identityNumber
+									}).eq('id', value),
+									catch: (error) => new SupabaseSDKError(error)
+								
+								}) .pipe(Effect.map(_ => ({
+									type: person.type,
+									nit: person.nit,
+									company_name: person.companyName,
+									id: person.id,
+									risk: person.risk,
+									full_name: person.fullName,
+									identity_type: person.identityType,
+									identity_number: person.identityNumber
+								}as any)))
+							} else  {
+								return Effect.tryPromise({
+									try: () => instance.from('person').insert({
+										type: person.type,
+										nit: person.nit,
+										company_name: person.companyName,
+										id: person.id,
+										risk: person.risk,
+										full_name: person.fullName,
+										identity_type: person.identityType,
+										identity_number: person.identityNumber
+									}).select().single(),
+									catch: (error) => new SupabaseSDKError(error)
+								})
+							}
+						})
+					).pipe(
+						Effect.flatMap(v => {
+							if (v.error !== null) {
+								return Effect.fail(new SupabaseSDKError(v.error))
+							}
+							return Effect.succeed({
+								id: v.data.id,
+								identityNumber: v.data.identity_number!,
+								identityType: v.data.identity_type!,
+								fullName: v.data.full_name!,
+								risk: v.data.risk!,
+								companyName: v.data.company_name!,
+								nit: v.data.nit!,
+								type: v.data.type!
+							} satisfies Person)
+						})
+				)
 
 		const deletePerson: SupabaseGateway['deletePerson'] = (id) => Effect.tryPromise({
 				try: () => instance.from('person').delete().eq('id', id),
