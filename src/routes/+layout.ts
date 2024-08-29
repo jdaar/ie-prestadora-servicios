@@ -1,4 +1,4 @@
-export const prerender = true;
+// export const prerender = true;
 import { Effect, Option } from 'effect';
 import type { LayoutLoad } from './$types';
 import { ConfigGatewayAdapter, ConfigGatewayLive } from '@/driven-adapters/config';

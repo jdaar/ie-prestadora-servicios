@@ -11,10 +11,15 @@
 	import { SavePerson } from "@/domain/use-cases/save-person.js";
 	import { ColumnSpacing } from "svelte-radix";
 	import type { Person } from "@/domain/models/person.js";
-	import { toast } from "svelte-sonner";../../../save/$types.js../edit/{personid}/save/$types.js
+	import { toast } from "svelte-sonner";
+	import { id } from "effect/Fiber";
+	import { page } from '$app/stores';
 
-	const { data } = $props();
+	
+	let personId = $page.params.personid;
+	const { data, } = $props();
 	const client = data.client;
+
 
 	const documentTypeOptions = [
 		{
@@ -61,6 +66,7 @@
 		() => {
 			if (Option.isSome(personType)) {
 				concretize(client, SavePerson({
+					id: personId,
 					type: personType.value === "NATURAL" ? "NATURAL" : "ARTIFICIAL",
 					nit: nit,
 					risk: risk,
