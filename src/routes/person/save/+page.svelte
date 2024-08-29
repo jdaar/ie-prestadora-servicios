@@ -70,7 +70,10 @@
 					identityNumber: documentNumber
 				}))
 					.then(() => toast.info("Se creo la persona satisfactoriamente"))
-					.catch(() => toast.error("No se pudo realizar esa accion"))
+					.catch((error) => {
+						toast.error("No se pudo realizar esa accion");
+						console.error(error)
+					})
 			}
 		}
 	)
