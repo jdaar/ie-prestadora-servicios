@@ -1,7 +1,7 @@
-import { SUPABASE_SDK_ERROR_TAG } from "@/resources/constants";
+import { SPREADSHEET_ERROR_TAG } from "@/resources/constants";
 import { Data } from "effect";
 
-export class SupabaseSDKError extends Data.TaggedError(SUPABASE_SDK_ERROR_TAG)<{
+export class SpreadsheetError extends Data.TaggedError(SPREADSHEET_ERROR_TAG)<{
 	message: string
 }> {
 	constructor(error: unknown) {

@@ -4,6 +4,7 @@ import { SupabaseGatewayAdapter, SupabaseInstanceRef, type SupabaseGateway } fro
 import { SupabaseSDKError } from "@/domain/models/errors/supabase-sdk-error";
 import type { User } from "@/domain/models/user";
 import type { Person } from "@/domain/models/person";
+import type { satisfies } from "effect/Function";
 
 export const SupabaseGatewayLive = Layer.effect(
 	SupabaseGatewayAdapter,
@@ -78,25 +79,50 @@ export const SupabaseGatewayLive = Layer.effect(
 							type: 'ARTIFICIAL',
 							nit: v.nit!,
 							id: v.id,
-							companyName: v.company_name!
+							companyName: v.company_name!,
 						} satisfies Person)
 					))
 				})
 			);
+
+		const savePerson: SupabaseGateway['savePerson'] = (person) => 
+		Effect.tryPromise({
+			try: () => instance.from('person').insert({
+				type: person.type,
+				nit: person.nit,
+				company_name: person.companyName,
+				id: person.id,
+				risk: person.risk,
+				full_name: person.fullName,
+				identity_type: person.identityType,
+				identity_number: person.identityNumber
+			}).select().single(),
+			catch: (error) => new SupabaseSDKError(error)
+		}).pipe(
+				Effect.flatMap(v => {
+					if (v.error !== null) {
+						return Effect.fail(new SupabaseSDKError(v.error))
+					}
+					return Effect.succeed({
+						id: v.data.id,
+						identityNumber: v.data.identity_number!,
+						identityType: v.data.identity_type!,
+						fullName: v.data.full_name!,
+						risk: v.data.risk!,
+						companyName: v.data.company_name!,
+						nit: v.data.nit!,
+						type: v.data.type!
+					} satisfies Person)
+				})
+		)
 
 		return SupabaseGatewayAdapter.of({
 			signIn,
 			signUp,
 			signOut,
 			getConnectedUser,
-			getPersons
+			getPersons,
+			savePerson
 		})
 	})
-)
-
-export const MainLive = Layer.merge(
-	SupabaseGatewayLive.pipe(
-		Layer.provide(ConfigGatewayLive),
-	),
-	ConfigGatewayLive
 )

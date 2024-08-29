@@ -19,7 +19,7 @@
 </script>
  
 <ContextMenu.Root>
-  <ContextMenu.Trigger>
+  <ContextMenu.Trigger class="unselectable">
 		<slot />
   </ContextMenu.Trigger>
   <ContextMenu.Content class="w-64">

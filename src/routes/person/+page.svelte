@@ -4,12 +4,13 @@
 	import * as Table from "$lib/components/ui/table/index.js";
 	import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 	import { Skeleton } from '@/components/ui/skeleton/index.js';
-	import { Effect, Option } from "effect";
+	import { Option } from "effect";
 	import SelectableColumnHeader from '@/components/custom/selectable-column-header.svelte';
 	import SearchableColumnHeader from '@/components/custom/searchable-column-header.svelte';
-	import type { Person } from '@/domain/models/person.js';
-	import { read, utils, writeFileXLSX } from 'xlsx';
+	import { utils, writeFileXLSX } from 'xlsx';
 	import Button from '@/components/ui/button/button.svelte';
+	import { GeneratePersonReport } from '@/domain/use-cases/generate-person-report.js';
+	import { goto } from '$app/navigation';
 
 	const { data } = $props();
 	const client = data.client;
@@ -50,60 +51,23 @@
 	let documentTypeFilter = $state(Option.none<string>());
 
 
-	let filterFn = $derived.by(() => {
-		const _documentNumberFilter = documentNumberFilter;
-		const _nameFilter = nameFilter;
-		const _typeFilter = typeFilter;
-		const _documentTypeFilter = documentTypeFilter;
-		
-
-		return Effect.map(
-			(initial: Array<Person>) => {
-				let result = initial 
-
-				if (Option.isSome(_documentTypeFilter)) {
-					result = result.filter((person) => person.type === "NATURAL" && person.identityType == _documentTypeFilter.value)
-				}
-
-				if (Option.isSome(_documentNumberFilter)) {
-					result = result.filter((person) => 
-						(person.type === "NATURAL" && person.identityNumber.toLowerCase().match(`.*(${_documentNumberFilter.value.toLowerCase()}).*`))
-						|| 
-						(person.type === "ARTIFICIAL" && person.nit.toLowerCase().match(`.*(${_documentNumberFilter.value.toLowerCase()}).*`))
-					)
-				}
-
-				if (Option.isSome(_nameFilter)) {
-					result = result.filter((person) => 
-						(person.type === "NATURAL" && person.fullName.toLowerCase().match(`.*(${_nameFilter.value.toLowerCase()}).*`))
-						|| 
-						(person.type === "ARTIFICIAL" && person.companyName.toLowerCase().match(`.*(${_nameFilter.value.toLowerCase()}).*`))
-					)
-				}
-
-				if (Option.isSome(_typeFilter)) {
-					result = result.filter((person) => person.type === _typeFilter.value)
-				}
-
-				return result
-			}
-		)
-	})
-
 	let personPromise = $derived(
-	 concretize(client, GetPersonList
-			.pipe(
-				filterFn
-			)
-		)
-	);
-
-	async function exportExcelBookCallback() {
-		const ws = utils.json_to_sheet(await personPromise);
-		const wb = utils.book_new();
-		utils.book_append_sheet(wb, ws, "Data");
-		writeFileXLSX(wb, "Personas.xlsx");
-	}
+		concretize(client, GetPersonList({
+			documentNumber: documentNumberFilter,
+			documentType: documentTypeFilter,
+			name: nameFilter,
+			type: typeFilter
+		})
+	));
+	
+	let personReportCallback = $derived(
+		() => concretize(client, GeneratePersonReport({
+			documentNumber: documentNumberFilter,
+			documentType: documentTypeFilter,
+			name: nameFilter,
+			type: typeFilter
+		}))
+	)
 
 	let filteredColumnNames = $derived([
 		Option.isSome(documentNumberFilter) ? 'numero de documento' : null,
@@ -117,7 +81,10 @@
 	<Card>
 		<CardHeader class="flex flex-row justify-between items-center">
 			<CardTitle>Listado de personas</CardTitle>
-			<Button variant="secondary" on:click={exportExcelBookCallback}>Exportar a excel</Button>
+			<div class="flex gap-2.5"> 
+				<Button variant="outline" on:click={() => goto('/person/save')}>Crear persona</Button>
+				<Button variant="secondary" on:click={personReportCallback}>Exportar a excel</Button>
+			</div>
 		</CardHeader>
 		<CardContent class="flex flex-col gap-5">
 			<Table.Root>

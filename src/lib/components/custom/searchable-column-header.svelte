@@ -14,7 +14,7 @@
 </script>
  
 <ContextMenu.Root>
-  <ContextMenu.Trigger class="w-full">
+  <ContextMenu.Trigger class="w-full unselectable">
 		<slot />
   </ContextMenu.Trigger>
   <ContextMenu.Content class="w-64">
