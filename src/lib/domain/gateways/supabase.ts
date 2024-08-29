@@ -17,6 +17,7 @@ interface IdentityProviderGateway {
 interface DatabaseGateway {
 	readonly getPersons: Effect.Effect<Array<Person>, SupabaseSDKError>
 	readonly savePerson: (person: Omit<Person, 'id'> & { id?: number }) => Effect.Effect<Person, SupabaseSDKError>
+	readonly deletePerson: (id: number) => Effect.Effect<void, SupabaseSDKError>
 }
 
 export interface SupabaseGateway extends IdentityProviderGateway, DatabaseGateway {

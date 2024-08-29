@@ -1,4 +1,5 @@
 <script lang="ts">
+  import * as ContextMenu from "$lib/components/ui/context-menu/index.js";
 	import { concretize } from '@/application/application';
 	import { GetPersonList } from '@/domain/use-cases/get-person-list.js';
 	import * as Table from "$lib/components/ui/table/index.js";
@@ -11,6 +12,8 @@
 	import Button from '@/components/ui/button/button.svelte';
 	import { GeneratePersonReport } from '@/domain/use-cases/generate-person-report.js';
 	import { goto } from '$app/navigation';
+	import { DeletePerson } from "@/domain/use-cases/delete-person.js";
+	import { toast } from "svelte-sonner";
 
 	const { data } = $props();
 	const client = data.client;
@@ -49,25 +52,38 @@
 	let nameFilter = $state(Option.none<string>());
 	let typeFilter = $state(Option.none<string>());
 	let documentTypeFilter = $state(Option.none<string>());
+	let deletedItemsCount = $state(0)
 
 
-	let personPromise = $derived(
-		concretize(client, GetPersonList({
-			documentNumber: documentNumberFilter,
-			documentType: documentTypeFilter,
-			name: nameFilter,
-			type: typeFilter
-		})
-	));
+	let personPromise = $derived.by(() => {
+		deletedItemsCount;
+		return concretize(client, GetPersonList({
+				documentNumber: documentNumberFilter,
+				documentType: documentTypeFilter,
+				name: nameFilter,
+				type: typeFilter
+			}))
+	});
 	
-	let personReportCallback = $derived(
-		() => concretize(client, GeneratePersonReport({
+	let personReportCallback = $derived.by(() => {
+		deletedItemsCount;
+		return () => concretize(client, GeneratePersonReport({
 			documentNumber: documentNumberFilter,
 			documentType: documentTypeFilter,
 			name: nameFilter,
 			type: typeFilter
 		}))
-	)
+	})
+
+	let personDeletionCallback = (id: number) => concretize(client, DeletePerson(id))
+		.then(() => {
+			toast.info("Operacion realizada exitosamente")
+			deletedItemsCount += 1
+		})
+		.catch((error) => {
+			toast.error("Se presento un error al realizar la accion solicitada")
+			console.error(error)
+		})
 
 	let filteredColumnNames = $derived([
 		Option.isSome(documentNumberFilter) ? 'numero de documento' : null,
@@ -110,13 +126,67 @@
 							</Table.Row>
 						{:then personList} 
 							{#each personList as person, i (i)}
-								<Table.Row>
-									<Table.Cell class="font-medium">{person.id}</Table.Cell>
-									<Table.Cell>{person.type}</Table.Cell>
-									<Table.Cell>{person.type === "NATURAL" ? person.fullName : person.companyName}</Table.Cell>
-									<Table.Cell>{person.type === "NATURAL" ? person.identityType : "NIT"}</Table.Cell>
-									<Table.Cell>{person.type === "NATURAL" ? person.identityNumber : person.nit}</Table.Cell>
-									<Table.Cell class="text-right">{person.type === "NATURAL" ? person.risk : "N/A"}</Table.Cell>
+								<Table.Row class="w-full">
+									<Table.Cell class="font-medium">
+										<ContextMenu.Root>
+											<ContextMenu.Trigger>
+													{person.id}
+											</ContextMenu.Trigger>
+											<ContextMenu.Content class="w-64">
+												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+											</ContextMenu.Content>
+										</ContextMenu.Root>
+									</Table.Cell>
+									<Table.Cell>
+										<ContextMenu.Root>
+											<ContextMenu.Trigger>
+													{person.type}
+											</ContextMenu.Trigger>
+											<ContextMenu.Content class="w-64">
+												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+											</ContextMenu.Content>
+										</ContextMenu.Root>
+									</Table.Cell>
+									<Table.Cell>
+										<ContextMenu.Root>
+											<ContextMenu.Trigger>
+												{person.type === "NATURAL" ? person.fullName : person.companyName}
+											</ContextMenu.Trigger>
+											<ContextMenu.Content class="w-64">
+												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+											</ContextMenu.Content>
+										</ContextMenu.Root>
+									</Table.Cell>
+									<Table.Cell>
+										<ContextMenu.Root>
+											<ContextMenu.Trigger>
+												{person.type === "NATURAL" ? person.identityType : "NIT"}
+											</ContextMenu.Trigger>
+											<ContextMenu.Content class="w-64">
+												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+											</ContextMenu.Content>
+										</ContextMenu.Root>
+									</Table.Cell>
+									<Table.Cell>
+										<ContextMenu.Root>
+											<ContextMenu.Trigger>
+												{person.type === "NATURAL" ? person.identityNumber : person.nit}
+											</ContextMenu.Trigger>
+											<ContextMenu.Content class="w-64">
+												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+											</ContextMenu.Content>
+										</ContextMenu.Root>
+									</Table.Cell>
+									<Table.Cell>
+										<ContextMenu.Root>
+											<ContextMenu.Trigger>
+												{person.type === "NATURAL" ? person.risk : "N/A"}
+											</ContextMenu.Trigger>
+											<ContextMenu.Content class="w-64">
+												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+											</ContextMenu.Content>
+										</ContextMenu.Root>
+									</Table.Cell>
 								</Table.Row>
 							{/each}
 						{/await}
@@ -127,4 +197,4 @@
 			</Table.Root>
 		</CardContent>
 	</Card>
-</main>
+	</main>

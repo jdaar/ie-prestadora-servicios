@@ -116,13 +116,19 @@ export const SupabaseGatewayLive = Layer.effect(
 				})
 		)
 
+		const deletePerson: SupabaseGateway['deletePerson'] = (id) => Effect.tryPromise({
+				try: () => instance.from('person').delete().eq('id', id),
+				catch: (error) => new SupabaseSDKError(error)
+			})
+
 		return SupabaseGatewayAdapter.of({
 			signIn,
 			signUp,
 			signOut,
 			getConnectedUser,
 			getPersons,
-			savePerson
+			savePerson,
+			deletePerson
 		})
 	})
 )
