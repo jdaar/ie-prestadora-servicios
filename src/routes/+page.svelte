@@ -4,12 +4,21 @@
 	import { Button, buttonVariants } from "@/components/ui/button";
 	import { GeneratePaymentReport } from "@/domain/use-cases/generate-payment-report.js";
 	import { Option } from "effect";
+	import { toast } from "svelte-sonner";
 
 	const { data } = $props();
 	const client = data.client;
 
 	const paymentsReportCallback = () => {
+		toast.info("Generando reporte de pagos...")
 		concretize(client, GeneratePaymentReport)
+			.then(() => {
+				toast.info("Se descargo el informe de pagos")
+			})
+			.catch((err) => {
+				toast.error("No se pudo generar el informe de pagos")
+				console.error(err)
+			})
 	}
 </script>
 
