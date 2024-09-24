@@ -20,6 +20,7 @@ interface IdentityProviderGateway {
 interface DatabaseGateway {
 	readonly getPerson: (personId: number) => Effect.Effect<Person, SupabaseSDKError>
 	readonly getBillingStatement: (billingStatementId: number) => Effect.Effect<BillingStatement, SupabaseSDKError>
+	readonly getBillingStatements: Effect.Effect<Array<BillingStatement>, SupabaseSDKError>
 	readonly getBillingStatementsByClientId: (clientId: number) => Effect.Effect<Array<BillingStatement>, SupabaseSDKError>
 	readonly getBillingStatementByServiceId: (serviceId: number) => Effect.Effect<BillingStatement, SupabaseSDKError>
 	readonly getClientByPersonId: (personId: number) => Effect.Effect<Client, SupabaseSDKError>

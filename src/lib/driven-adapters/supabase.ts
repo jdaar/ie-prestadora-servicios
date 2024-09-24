@@ -191,6 +191,30 @@ export const SupabaseGatewayLive = Layer.effect(
 			return output;
 		})
 
+		const getBillingStatements: SupabaseGateway['getBillingStatements'] = Effect.gen(function *(_) {
+			const billingStatements = yield *_(Effect.tryPromise({
+				try: () => instance.from('billing_statement').select(),
+				catch: (error) => new SupabaseSDKError(error)
+			}));
+			if (billingStatements.error) {
+				yield *_(Effect.fail(new SupabaseSDKError("Entity not found")))
+			}
+			const output: Array<BillingStatement> = new Array();
+			for (let idx = 0; idx < billingStatements.data!.length; idx += 1) {
+				const billingStatementData = billingStatements.data![idx];
+				// better performance with join but fuck it
+				const service = yield *_(getService(billingStatementData.service_id))
+				output.push({
+					id: billingStatementData.id,
+					createdAt: new Date(billingStatementData.created_at),
+					service,
+					clientId: billingStatementData.client_id,
+					total: billingStatementData.total
+				})
+			}
+			return output;
+		})
+
 		const getClientByPersonId: SupabaseGateway['getClientByPersonId'] = (personId: number) => Effect.gen(function *(_) {
 			const client = yield *_(Effect.tryPromise({
 				try: () => instance.from('client').select().eq('person_id', personId).limit(1).single(),
@@ -431,6 +455,7 @@ export const SupabaseGatewayLive = Layer.effect(
 			getBillingStatement,
 			saveClient,
 			deletePerson,
+			getBillingStatements,
 			saveBillingStatement,
 			saveService
 		})
