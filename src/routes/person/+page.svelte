@@ -8,7 +8,6 @@
 	import { Option } from "effect";
 	import SelectableColumnHeader from '@/components/custom/selectable-column-header.svelte';
 	import SearchableColumnHeader from '@/components/custom/searchable-column-header.svelte';
-	import { utils, writeFileXLSX } from 'xlsx';
 	import Button from '@/components/ui/button/button.svelte';
 	import { GeneratePersonReport } from '@/domain/use-cases/generate-person-report.js';
 	import { goto } from '$app/navigation';
@@ -116,14 +115,16 @@
 				</Table.Header>
 					<Table.Body>
 						{#await personPromise}
+							{#each new Array(5).fill(0) as id}
 							<Table.Row>
 								<Table.Cell class="font-medium"><Skeleton class="h-[20px] w-[50px] rounded-full"/></Table.Cell>
 								<Table.Cell><Skeleton class="h-[20px] w-[100px] rounded-full"/></Table.Cell>
 								<Table.Cell><Skeleton class="h-[20px] w-[100px] rounded-full"/></Table.Cell>
 								<Table.Cell><Skeleton class="h-[20px] w-[100px] rounded-full"/></Table.Cell>
 								<Table.Cell><Skeleton class="h-[20px] w-[100px] rounded-full"/></Table.Cell>
-								<Table.Cell class="text-right"><Skeleton class="h-[20px] w-[50px] rounded-full"/></Table.Cell>
+								<Table.Cell class="flex justify-end"><Skeleton class="h-[20px] w-[50px] rounded-full"/></Table.Cell>
 							</Table.Row>
+							{/each}
 						{:then personList} 
 							{#each personList as person, i (i)}
 								<Table.Row class="w-full">
@@ -134,6 +135,7 @@
 											</ContextMenu.Trigger>
 											<ContextMenu.Content class="w-64">
 												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+												<ContextMenu.Item on:click={() => goto(`/client/save?person-id=${person.id}`)}>Crear cliente</ContextMenu.Item>
 											</ContextMenu.Content>
 										</ContextMenu.Root>
 									</Table.Cell>
@@ -144,6 +146,7 @@
 											</ContextMenu.Trigger>
 											<ContextMenu.Content class="w-64">
 												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+												<ContextMenu.Item on:click={() => goto(`/client/save?person-id=${person.id}`)}>Crear cliente</ContextMenu.Item>
 											</ContextMenu.Content>
 										</ContextMenu.Root>
 									</Table.Cell>
@@ -154,6 +157,7 @@
 											</ContextMenu.Trigger>
 											<ContextMenu.Content class="w-64">
 												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+												<ContextMenu.Item on:click={() => goto(`/client/save?person-id=${person.id}`)}>Crear cliente</ContextMenu.Item>
 											</ContextMenu.Content>
 										</ContextMenu.Root>
 									</Table.Cell>
@@ -164,6 +168,7 @@
 											</ContextMenu.Trigger>
 											<ContextMenu.Content class="w-64">
 												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+												<ContextMenu.Item on:click={() => goto(`/client/save?person-id=${person.id}`)}>Crear cliente</ContextMenu.Item>
 											</ContextMenu.Content>
 										</ContextMenu.Root>
 									</Table.Cell>
@@ -174,16 +179,18 @@
 											</ContextMenu.Trigger>
 											<ContextMenu.Content class="w-64">
 												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+												<ContextMenu.Item on:click={() => goto(`/client/save?person-id=${person.id}`)}>Crear cliente</ContextMenu.Item>
 											</ContextMenu.Content>
 										</ContextMenu.Root>
 									</Table.Cell>
 									<Table.Cell>
 										<ContextMenu.Root>
-											<ContextMenu.Trigger>
+											<ContextMenu.Trigger class="text-right">
 												{person.type === "NATURAL" ? person.risk : "N/A"}
 											</ContextMenu.Trigger>
 											<ContextMenu.Content class="w-64">
 												<ContextMenu.Item on:click={() => personDeletionCallback(person.id)}>Eliminar</ContextMenu.Item>
+												<ContextMenu.Item on:click={() => goto(`/client/save?person-id=${person.id}`)}>Crear cliente</ContextMenu.Item>
 											</ContextMenu.Content>
 										</ContextMenu.Root>
 									</Table.Cell>

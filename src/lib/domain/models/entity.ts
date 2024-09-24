@@ -1,3 +1,4 @@
 export type Entity<T> = {
-	id: number
+	id: number;
+	createdAt?: Date;
 } & T

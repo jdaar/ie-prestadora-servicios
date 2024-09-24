@@ -13,6 +13,7 @@
 			</h2>
 			<div class="flex flex-col gap-2">
 				<a href="/person" class={buttonVariants({variant: 'secondary'})}>Gestionar personas</a>
+				<a href="/client" class={buttonVariants({variant: 'secondary'})}>Gestionar clientes</a>
 			</div>
 		</div>
 	{/if}
