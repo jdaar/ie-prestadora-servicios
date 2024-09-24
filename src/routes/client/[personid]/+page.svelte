@@ -47,6 +47,18 @@
 			<Skeleton class="h-[20px] w-[100px] rounded-full"/>
 		</CardHeader>
 		<CardContent class="flex flex-col gap-5">
+			<div class="flex gap-10 justify-between pt-5 pb-5">
+				{#each new Array(6).fill(0) as _}
+				<div class="flex flex-col gap-1">
+					<p class="text-muted-foreground text-sm">
+						<Skeleton class="h-[20px] w-[100px] rounded-full"/>
+					</p>
+					<small class="text-sm font-medium leading-none">
+						<Skeleton class="h-[20px] w-[200px] rounded-full"/>
+					</small>
+				</div>
+				{/each}
+			</div>
 			<Skeleton class="h-[20px] w-[100px] rounded-full"/>
 			<Skeleton class="h-[100px] w-full rounded"/>
 			<Skeleton class="h-[20px] w-[100px] rounded-full"/>
@@ -62,6 +74,36 @@
 			</div>
 		</CardHeader>
 		<CardContent class="flex flex-col gap-5">
+			<div class="flex gap-10 justify-between pt-5 pb-5">
+				<div>
+					<p class="text-muted-foreground text-sm">Riesgo</p>
+					<small class="text-sm font-medium leading-none">{person.risk}</small>
+				</div>
+				<div>
+					<p class="text-muted-foreground text-sm">Tipo</p>
+					<small class="text-sm font-medium leading-none">{person.type}</small>
+				</div>
+				<div>
+					<p class="text-muted-foreground text-sm">Tipo de documento</p>
+					<small class="text-sm font-medium leading-none">{person.identityType ?? 'N/A'}</small>
+				</div>
+				<div>
+					<p class="text-muted-foreground text-sm">Numero de documento</p>
+					<small class="text-sm font-medium leading-none">{person.identityNumber ?? 'N/A'}</small>
+				</div>
+				<div>
+					<p class="text-muted-foreground text-sm">Nombre de compania</p>
+					<small class="text-sm font-medium leading-none">{person.companyName ?? 'N/A'}</small>
+				</div>
+				<div>
+					<p class="text-muted-foreground text-sm">NIT</p>
+					<small class="text-sm font-medium leading-none">{person.nit ?? 'N/A'}</small>
+				</div>
+				<div>
+					<p class="text-muted-foreground text-sm">Creado en</p>
+					<small class="text-sm font-medium leading-none">{person.createdAt?.toLocaleDateString() ?? 'N/A'}</small>
+				</div>
+			</div>
 			<CardTitle>Servicios</CardTitle>
 			<Table.Root>
 				<Table.Header>

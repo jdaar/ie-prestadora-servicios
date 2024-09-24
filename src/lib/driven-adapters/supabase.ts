@@ -72,7 +72,8 @@ export const SupabaseGatewayLive = Layer.effect(
 							risk: v.risk!,
 							fullName: v.full_name!,
 							identityType: v.identity_type!,
-							identityNumber: v.identity_number!
+							identityNumber: v.identity_number!,
+							createdAt: new Date(v.created_at)
 						} satisfies Person)
 						:
 						({
@@ -80,6 +81,7 @@ export const SupabaseGatewayLive = Layer.effect(
 							nit: v.nit!,
 							id: v.id,
 							companyName: v.company_name!,
+							createdAt: new Date(v.created_at)
 						} satisfies Person)
 					))
 				})
@@ -100,7 +102,8 @@ export const SupabaseGatewayLive = Layer.effect(
 							risk: v.risk!,
 							fullName: v.full_name!,
 							identityType: v.identity_type!,
-							identityNumber: v.identity_number!
+							identityNumber: v.identity_number!,
+							createdAt: new Date(v.created_at)
 						} satisfies Person)
 						:
 						({
@@ -108,6 +111,7 @@ export const SupabaseGatewayLive = Layer.effect(
 							nit: v.nit!,
 							id: v.id,
 							companyName: v.company_name!,
+							createdAt: new Date(v.created_at)
 						} satisfies Person)
 					)[0])
 				})
