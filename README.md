@@ -1,38 +1,21 @@
-# create-svelte
+# IE Prestadora de servicios
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+Aplicación de manejo de clientes, servicios y cuentas de cobro para dichos servicios. Cuenta con generación de reportes y operaciones CRUD para las entidades de dominio.
 
-## Creating a project
+## Diseño
 
-If you're seeing this, you've probably already done this step. Congrats!
+La aplicación usa DDD y arquitectura hexagonal, usa Effect como sistema de efectos funcionales y aprovecha su implementación del monada Reader para realizar la inyección de dependencias, está pensada para usar Supabase como backend
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+### Diagrama de modelo
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+### Diagrama de casos de uso
 
-## Developing
+### Diagrama de procesos relacionado
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Estructura
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+- /application -> Capa de aplicación, responsable de los mecanismos de IoC
+- /components -> Componentes
+- /domain -> Gateways, modelo y use cases
+- /driven-adapters -> Driven-adapters (Supabase y spreadsheet)
+- /routes -> Vistas
