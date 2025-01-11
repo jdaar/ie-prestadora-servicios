@@ -8,9 +8,15 @@ La aplicación usa DDD y arquitectura hexagonal, usa Effect como sistema de efec
 
 ### Diagrama de modelo
 
+![diagrama_modelo](./model-diagram.PNG)
+
 ### Diagrama de casos de uso
 
+![diagrama_casos_uso](./usecase-diagram.PNG)
+
 ### Diagrama de procesos relacionado
+
+![diagrama_procesos](./process-diagram.PNG)
 
 ## Estructura
 
